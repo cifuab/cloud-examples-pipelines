@@ -1,0 +1,62 @@
+<policies>
+    <inbound>
+        <base />
+        
+        <!-- Validate JWT token with role-based authorization -->
+        <validate-jwt header-name="Authorization" 
+            failed-validation-httpcode="401" 
+            failed-validation-error-message="Unauthorized. Access token is missing or invalid.">
+            <openid-config url="https://login.microsoftonline.com/YOUR_TENANT2_ID/.well-known/openid-configuration" />
+            <audiences>
+                <audience>YOUR_TENANT2_API_APPID</audience>
+            </audiences>
+            <issuers>
+                <issuer>https://sts.windows.net/YOUR_TENANT2_ID/</issuer>
+            </issuers>
+            <required-claims>
+                <claim name="aud" match="any">
+                    <value>YOUR_TENANT2_API_APPID</value>
+                </claim>
+                <claim name="roles" match="any">
+                    <value>access_as_app</value>
+                </claim>
+                <claim name="appidacr" match="any">
+                    <value>2</value>
+                </claim>
+            </required-claims>
+        </validate-jwt>
+        
+        <!-- Optional: Return success response without backend for testing -->
+        <return-response>
+            <set-status code="200" reason="OK" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                var jwt = context.Request.Headers.GetValueOrDefault("Authorization","").AsJwt();
+                var roles = jwt?.Claims.GetValueOrDefault("roles", "[]");
+                var oid = jwt?.Claims.GetValueOrDefault("oid", "unknown");
+                var aud = jwt?.Claims.GetValueOrDefault("aud", "unknown");
+                
+                return new JObject(
+                    new JProperty("message", "Token validated successfully!"),
+                    new JProperty("from", "tenant2 APIM"),
+                    new JProperty("authenticated", true),
+                    new JProperty("authorized", true),
+                    new JProperty("audience", aud),
+                    new JProperty("roles", roles),
+                    new JProperty("callerObjectId", oid)
+                ).ToString();
+            }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
