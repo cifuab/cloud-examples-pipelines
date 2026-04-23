@@ -8,4 +8,4 @@ That part is easy to miss because the early signs do not always look like failur
 
 That was the real reason I built my terraform-module-creator agent skill. I did not want a skill that just turned a prompt into a few Terraform files and called that job done. I wanted something that helps with the design judgement that should happen before generation begins, because that is usually where the difference is made between a module that becomes genuinely useful and one that ends up as another shared layer people work around.
 
-[Blog post here](https://thomasthornton.cloud/2022/07/01/using-the-terraform-resource-azapi_update_resource-to-update-azure-resources-that-are-not-yet-supported-in-azurerm-provider/)
+[Blog post here](https://thomasthornton.cloud/terraform-module-design-is-the-hard-part-so-i-built-an-agent-skill-for-it/)
